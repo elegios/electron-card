@@ -13,8 +13,7 @@
              {:min-width calc-width :max-width calc-width
               :min-height calc-height :max-height calc-height}
              (apply vector (keyword (str ".inner" id-str))
-                           {:min-width width :max-width width
-                            :min-height height :max-height height}
+                           {:width width :height height}
                            css)]
         html [(keyword (str "div.outer" id-str))
               (apply vector (keyword (str "div.inner" id-str)) html)]]

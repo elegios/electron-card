@@ -4,19 +4,29 @@
     <meta charset="UTF-8">
     <title>Hello World!</title>
     <style>
+    html, body {
+      height: 100%;
+    }
     body {
       display: flex;
       flex-direction: column;
+      margin: 0px;
+    }
+    #display-area {
+      flex-grow: 1;
     }
     #components-html {
       display: flex;
       flex-wrap: wrap;
       align-items: flex-start;
       align-content: flex-start;
-      flex-grow: 1;
+      width: 100%;
+      height: 100%;
     }
     #components-html > div {
-      overflow: hidden
+      overflow: hidden;
+      margin-right: 3px;
+      margin-bottom: 3px;
     }
     #components-html > div > div {
       transform-origin: 0px 0px;
@@ -24,6 +34,7 @@
     }
     #errors {
       order: 3;
+      white-space: pre-line;
     }
     </style>
   </head>
@@ -35,6 +46,7 @@
       200%
       <span id="scale-text">(100%)</span>
     </div>
+    <div id="display-area"></div>
     <div id="errors"></div>
   </body>
   <script>

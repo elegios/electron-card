@@ -1,6 +1,7 @@
 (ns electron-card.app
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [cljs.nodejs :as nodejs]
+            [clojure.string :as str]
             [electron-card.eval :as ev]
             [electron-card.game :as game]
             [cljs.core.async :refer [<! promise-chan put!]]
@@ -20,6 +21,10 @@
 (def last-source (atom ""))
 (def components-html (atom nil))
 
+(defn set-errors [errors]
+  (set! (.-textContent (js/document.getElementById "errors"))
+        (str/join "\n" errors)))
+
 (defn render-result [result]
   (let [comp-style (js/document.getElementById "components-style")
         renderables (map game/component-to-renderable (game/extract-components result))
@@ -29,7 +34,8 @@
       (hipo/reconciliate! @components-html comp-html)
       (do
         (reset! components-html (hipo/create comp-html))
-        (js/document.body.appendChild @components-html)))))
+        (.appendChild (js/document.getElementById "display-area")
+                      @components-html)))))
 
 (defn file-changed [kind file]
   (if (not= kind "change")
@@ -42,6 +48,7 @@
             (println "different source")
             (reset! last-source new-source)
             (let [{:keys [errors value]} (<! (ev/eval new-source))]
+              (set-errors errors)
               (if value
                 (render-result value)
                 (println errors)))))))))
