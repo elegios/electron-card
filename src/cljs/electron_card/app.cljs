@@ -2,6 +2,7 @@
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [cljs.nodejs :as nodejs]
             [electron-card.eval :as ev]
+            [electron-card.game :as game]
             [cljs.core.async :refer [<! promise-chan put!]]
             [garden.core :refer [css]]
             [hipo.core :as hipo]))
@@ -19,10 +20,11 @@
 (def last-source (atom ""))
 (def components-html (atom nil))
 
-(defn render-result [{c :css h :html}]
+(defn render-result [result]
   (let [comp-style (js/document.getElementById "components-style")
-        comp-html [:div#components-html h]]
-    (set! (.-innerHTML comp-style) (apply css c))
+        renderables (map game/component-to-renderable (game/extract-components result))
+        comp-html (apply vector :div#components-html (map :html renderables))]
+    (set! (.-innerHTML comp-style) (apply css (map :css renderables)))
     (if @components-html
       (hipo/reconciliate! @components-html comp-html)
       (do

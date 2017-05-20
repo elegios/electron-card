@@ -4,7 +4,7 @@
             [clojure.string :as str]
             [cljs.analyzer :as ana]))
 
-(create-ns 'cljs.user)
+(set! js/cljs.user #js{})
 
 (def vm (js/require "vm"))
 (def st (cljs/empty-state))

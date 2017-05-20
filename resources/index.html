@@ -3,9 +3,46 @@
   <head>
     <meta charset="UTF-8">
     <title>Hello World!</title>
+    <style>
+    body {
+      display: flex;
+      flex-direction: column;
+    }
+    #components-html {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      align-content: flex-start;
+      flex-grow: 1;
+    }
+    #components-html > div {
+      overflow: hidden
+    }
+    #components-html > div > div {
+      transform-origin: 0px 0px;
+      transform: scale(var(--component-scale));
+    }
+    #errors {
+      order: 3;
+    }
+    </style>
   </head>
   <body>
     <style id="components-style"></style>
+    <div id="controls">
+      10%
+      <input type="range" min="10" max="200" step="10" value="100" oninput="updateScale(this.value)">
+      200%
+      <span id="scale-text">(100%)</span>
+    </div>
+    <div id="errors"></div>
   </body>
-  <script> require("./js/app.js") </script>
+  <script>
+  require("./js/app.js")
+
+  function updateScale(scale) {
+    document.body.style.setProperty("--component-scale", scale/100);
+    document.getElementById("scale-text").textContent = "(" + scale + "%)"
+  }
+  </script>
 </html>
