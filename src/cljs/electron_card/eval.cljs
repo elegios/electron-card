@@ -6,8 +6,8 @@
 
 (set! js/cljs.user #js{})
 
-(def vm (js/require "vm"))
-(def st (cljs/empty-state))
+(def ^:private vm (js/require "vm"))
+(def ^:private st (cljs/empty-state))
 
 (set! *target* "nodejs")
 

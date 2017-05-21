@@ -1,6 +1,6 @@
 (ns electron-card.game)
 
-(def last-id (atom 0))
+(def ^:private last-id (atom 0))
 
 (defn component-to-renderable
   [{:keys [css html width height]}]
@@ -12,14 +12,18 @@
         css [(keyword (str ".outer" id-str))
              {:min-width calc-width :max-width calc-width
               :min-height calc-height :max-height calc-height}
-             (apply vector (keyword (str ".inner" id-str))
+             (apply vector (keyword (str ".inner.comp" id-str))
                            {:width width :height height}
                            css)]
         html [(keyword (str "div.outer" id-str))
-              (apply vector (keyword (str "div.inner" id-str)) html)]]
+              (apply vector (keyword (str "div.inner.comp" id-str)) html)]]
     {:css css :html html}))
 
 (defmulti extract-components :type)
+
+(defmethod extract-components :empty
+  [_]
+  #{})
 
 (defmethod extract-components :component-collection
   [{:keys [components]}]
@@ -27,4 +31,5 @@
 
 (defmethod extract-components :default
   [coll]
+  ; TODO: report error probably
   (set coll))

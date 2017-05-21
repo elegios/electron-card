@@ -38,6 +38,10 @@
     }
     #controls {
       border-bottom-style: solid;
+      display: flex;
+      justify-content: space-around;
+      align-items: baseline;
+      flex-shrink: 0;
     }
     #errors {
       border-top-style: solid;
@@ -50,10 +54,16 @@
   <body>
     <style id="components-style"></style>
     <div id="controls">
-      10%
-      <input type="range" min="10" max="200" step="10" value="100" oninput="updateScale(this.value)">
-      200%
-      <span id="scale-text">(100%)</span>
+      <span>
+        10%
+        <input type="range" min="10" max="200" step="10" value="100" oninput="updateScale(this.value)">
+        200%
+        <span id="scale-text">(100%)</span>
+      </span>
+      <span>
+        <input id="show-new" type="checkbox">
+        <label for="show-new">Show only changed components</label>
+      </span>
     </div>
     <div id="display-area"></div>
     <div id="errors"></div>
