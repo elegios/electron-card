@@ -9,7 +9,8 @@
                  [org.clojure/clojurescript "1.9.293"]
                  [org.clojure/core.async    "0.3.442"]
                  [garden                    "1.3.2"]
-                 [hipo                      "0.5.2"]])
+                 [hipo                      "0.5.2"]
+                 [com.rpl/specter           "1.0.1"]])
 
 (require
  '[adzerk.boot-cljs      :refer [cljs]]
