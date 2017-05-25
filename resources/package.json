@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "main": "main.js",
   "dependencies": {
-    "dom-to-image": "^2.5.2"
+    "dom-to-image": "^2.5.2",
+    "request": "^2.81.0"
   }
 }
