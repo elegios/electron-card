@@ -6,7 +6,7 @@
             [electron-card.imgur :as imgur]
             [electron-card.image :as image]
             [electron-card.game :as game]
-            electron-card.game.tts
+            [electron-card.game.tts :as tts]
             [cljs.core.async :refer [<!]]))
 
 (nodejs/enable-util-print!)
@@ -17,15 +17,12 @@
           {:keys [width height]} (first comps)
           columns 4
           rows 2
-          width (str "calc(" columns "*" width ")")
-          height (str "calc(" rows "*" height ")")
           renderables (map game/component-to-renderable comps)
-          {:keys [value error]} (<! (image/spreadsheet renderables
-                                      :width width :height height
-                                      :columns columns :rows rows))]
-      (if error
-        (println error)
-        (println value)))))
+          {:keys [value errors]} (<! (tts/auto-spreadsheets renderables
+                                       :width width :height height))]
+      (if errors
+        (println "errs" errors)
+        (println "value" value)))))
 
 (defn init []
   (state/add-game-update-fn :default view/update-game)

@@ -7,18 +7,18 @@
 (def ^:private dom-to-image (js/require "dom-to-image"))
 
 (defn spreadsheet
-  [renderables & {:keys [width height rows columns]}]
+  [renderables & {:keys [width height rows columns ret]}]
   (let [style [:style
                (str ".spreadsheet{"
                     "display:flex;"
                     "flex-wrap:wrap;"
-                    "width:" width ";"
-                    "height:" height ";}")
+                    "width:calc(" columns "*" width ");"
+                    "height:calc(" rows "*" height ");}")
                (map (comp css :css) renderables)]
         html [:div.spreadsheet
               style
               (map :html renderables)]
-        ret (promise-chan)
+        ret (or ret (promise-chan))
         node (hipo/create html [style-handler])]
     (js/document.body.appendChild node)
     (-> (.toPng dom-to-image node)
@@ -28,7 +28,7 @@
             (put! ret {:value value}))
           (fn [error]
             (js/document.body.removeChild node)
-            (put! ret {:error error}))))
+            (put! ret {:errors [error]}))))
     ret))
 
   ; TODO: make html and css to lay out renderables in spreadsheet
