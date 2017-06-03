@@ -43,6 +43,9 @@
               (reset! last-components (extract-components @game))
               (reset! game value))))))))
 
+(defn get-state []
+  @game)
+
 (defn get-new-components []
   (set/difference (extract-components @game) @last-components))
 

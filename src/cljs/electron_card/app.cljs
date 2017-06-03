@@ -7,22 +7,21 @@
             [electron-card.image :as image]
             [electron-card.game :as game]
             [electron-card.game.tts :as tts]
-            [cljs.core.async :refer [<!]]))
+            [cljs.core.async :refer [<!]]
+            [com.rpl.specter :refer [MAP-VALS] :refer-macros [transform]]))
 
 (nodejs/enable-util-print!)
 
+(defn- log-first
+  [val label]
+  (println label val))
+
 (defn test-render []
   (go
-    (let [comps (state/get-all-components)
-          {:keys [width height]} (first comps)
-          columns 4
-          rows 2
-          renderables (map game/component-to-renderable comps)
-          {:keys [value errors]} (<! (tts/auto-spreadsheets renderables
-                                       :width width :height height))]
-      (if errors
+    (let [{:keys [errors] :as res} (-> (state/get-state) tts/collect-cards set tts/auto-spreadsheets <!)]
+      (if (seq errors)
         (println "errs" errors)
-        (println "value" value)))))
+        (println "res" (transform [MAP-VALS] count res))))))
 
 (defn init []
   (state/add-game-update-fn :default view/update-game)
