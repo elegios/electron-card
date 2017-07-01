@@ -1,4 +1,4 @@
-(ns electron-card.imgur
+(ns electron-card.upload.imgur
   (:require [electron-card.keys :refer [imgur-clientid]
                                 :rename {imgur-clientid clientid}]
             [cljs.core.async :refer [promise-chan put!]]))
