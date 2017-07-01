@@ -7,6 +7,7 @@
 
 (defn make-save-fn
   [directory]
+  ; TODO: ensure directory exists
   (let [file-num (atom 0)]
     (fn [data-url]
       (p/promise
