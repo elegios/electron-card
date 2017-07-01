@@ -1,27 +1,27 @@
 (ns electron-card.app
-  (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [cljs.nodejs :as nodejs]
             [electron-card.state :as state]
             [electron-card.view :as view]
-            [electron-card.imgur :as imgur]
             [electron-card.image :as image]
+            [electron-card.upload.file :as file]
             [electron-card.game :as game]
             [electron-card.game.tts :as tts]
-            [cljs.core.async :refer [<!]]
+            [promesa.core :as p]
             [com.rpl.specter :refer [MAP-VALS] :refer-macros [transform]]))
 
 (nodejs/enable-util-print!)
 
-(defn- log-first
-  [val label]
-  (println label val))
+; TODO: promesa (actually bluebird) requirest that values that are rejected with are Error, add one of those that collects all errors
 
 (defn test-render []
-  (go
-    (let [{:keys [errors] :as res} (-> (state/get-state) tts/collect-cards set tts/auto-spreadsheets <!)]
-      (if (seq errors)
-        (println "errs" errors)
-        (println "res" (transform [MAP-VALS] count res))))))
+  (let [upload-fn (file/make-save-fn "./out")]
+    (->> (state/get-all-components)
+         (map game/component-to-renderable)
+         (map image/image)
+         (map #(p/then % upload-fn))
+         p/all
+         (p/map #(println "value: " %))
+         (p/catch #(println "catch: " %)))))
 
 (defn init []
   (state/add-game-update-fn :default view/update-game)

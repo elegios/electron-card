@@ -7,7 +7,7 @@
                  [org.clojure/tools.nrepl   "0.2.12"     :scope "test"]
                  [weasel                    "0.7.0"      :scope "test"]
                  [org.clojure/clojurescript "1.9.293"]
-                 [org.clojure/core.async    "0.3.442"]
+                 [funcool/promesa           "1.8.1"]
                  [garden                    "1.3.2"]
                  [hipo                      "0.5.2"]
                  [com.rpl/specter           "1.0.1"]])

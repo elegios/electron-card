@@ -8,6 +8,7 @@
 (def ^:private components-html (atom nil))
 
 (defn update-errors [errors]
+  (apply js/console.error errors)
   (set! (.-textContent (js/document.getElementById "errors"))
         (str/join "\n" errors)))
 

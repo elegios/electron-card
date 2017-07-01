@@ -1,26 +1,28 @@
 (ns electron-card.image
   (:require [garden.core :refer [css]]
             [hipo.core :as hipo]
-            [cljs.core.async :refer [promise-chan put!]]))
+            [promesa.core :as p]))
 
 (def ^:private dom-to-image (js/require "dom-to-image"))
 
 (defn- render-node
-  [node ret]
-  (let [ret (or ret (promise-chan))]
-    (js/document.body.appendChild node)
-    (-> (.toPng dom-to-image node)
-        (.then
-          (fn [value]
-            (js/document.body.removeChild node)
-            (put! ret {:value value}))
-          (fn [error]
-            (js/document.body.removeChild node)
-            (put! ret {:errors [error]}))))
-    ret))
+  [node]
+  (p/promise
+    (fn [resolve reject]
+      (js/document.body.appendChild node)
+      ; TODO: the added children are not guaranteed to have rendered in the next call, insert some form of wait here
+      ; TODO: components with the exact same size might not be rendered to the same size (off by one pixel) (presumably only the case when exact size is a fraction)
+      (-> (.toPng dom-to-image node)
+          (.then
+            (fn [value]
+              (js/document.body.removeChild node)
+              (resolve value))
+            (fn [error]
+              (js/document.body.removeChild node)
+              (reject [error])))))))
 
 (defn spreadsheet
-  [renderables & {:keys [width height rows columns ret]}]
+  [renderables & {:keys [width height rows columns]}]
   (let [style [:style
                (str ".spreadsheet{"
                     "display:flex;"
@@ -32,11 +34,11 @@
               style
               (map :html renderables)]
         node (hipo/create html)]
-    (render-node node ret)))
+    (render-node node)))
 
 (defn image
-  [renderable & {:keys [ret]}]
+  [renderable]
   (let [style [:style (-> renderable :css css)]
         html (conj (:html renderable) style)
         node (hipo/create html)]
-    (render-node node ret)))
+    (render-node node)))

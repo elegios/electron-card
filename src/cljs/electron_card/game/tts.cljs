@@ -1,8 +1,7 @@
 (ns electron-card.game.tts
-  (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [electron-card.game :as game]
             [electron-card.image :as image]
-            [cljs.core.async :as async :refer [promise-chan <! >! to-chan close!]]
+            [promesa.core :as p]
             [com.rpl.specter :refer [ALL STAY MAP-VALS must multi-path traverse walker]
                              :refer-macros [transform select]]))
 
@@ -37,62 +36,57 @@
         [(* rows columns) [rows columns]]))))
 
 (defn- make-spreadsheet [width height]
-  (fn [renderables out]
-    (go
-      (let [[[rows columns]] (filter
-                               (fn [[size]] (<= size (count renderables)))
-                               sizes)]
-        (>! out (<! (image/spreadsheet renderables
-                      :width width :height height
-                      :rows rows :columns columns)))
-        (close! out)))))
+  (fn [renderables]
+    (let [[[rows columns]] (filter
+                             (fn [[size]] (<= size (count renderables)))
+                             sizes)]
+      (image/spreadsheet renderables
+        :width width :height height
+        :rows rows :columns columns))))
 
 (defn- make-spreadsheets
   [renderables width height]
-  (let [partitions (to-chan (partition-all 70 renderables))
-        ch (async/chan 5)]
-    (async/pipeline-async 5 ch (make-spreadsheet width height) partitions)
-    (async/into [] ch)))
+  ; TODO: collect multiple errors
+  (p/all (map (make-spreadsheet width height)
+              (partition-all 70 renderables))))
 
 (defn- get-size
   [{{:keys [width height]} :front}]
   [width height])
 
-(defn auto-spreadsheets
-  [cards & {:keys [ret]}]
-  (let [ret (or ret (promise-chan))]
-    (go
-      (let [sized-backed
-            (->> cards
-                 (group-by get-size)
-                 (transform [MAP-VALS] #(group-by :back %)))
-            sized-backed
-            (for [[[width height] backed] sized-backed
-                  [back similar-cards] backed]
-              [width height back similar-cards])]
-        (loop [deck-number 1
-               acc {:sheets {} :backs {} :errors [] :card-ids {}}
-               [[width height back similar-cards] & rest] sized-backed]
-          (let [renderables (map (comp game/component-to-renderable :front)
-                                 similar-cards)
-                back-renderable (game/component-to-renderable back)
-                back (<! (image/image back-renderable))
-                sheets (<! (make-spreadsheets renderables width height))
-                errors (concat (filter identity (map :errors sheets)))
-                sheets (map :value sheets)
-                deck-numbers (range deck-number (+ deck-number (count sheets)))
-                card-numbers (for [deck-number deck-numbers
-                                   n (range 1 70)]
-                               (+ n (* 100 deck-number)))
-                next (merge-with into acc
-                       {:sheets (map vector deck-numbers sheets)
-                        :backs (map vector deck-numbers (repeat back))
-                        :errors errors
-                        :card-ids (map vector similar-cards card-numbers)})]
-            (if rest
-              (recur (+ deck-number (count sheets)) next rest)
-              (>! ret next))))))
-    ret))
+; TODO: rewrite with promesa
+; (defn auto-spreadsheets
+;   [cards]
+;   (let [sized-backed
+;         (->> cards
+;              (group-by get-size)
+;              (transform [MAP-VALS] #(group-by :back %)))
+;         sized-backed
+;         (for [[[width height] backed] sized-backed
+;               [back similar-cards] backed]
+;           [width height back similar-cards])]
+;     (loop [deck-number 1
+;            acc {:sheets {} :backs {} :errors [] :card-ids {}}
+;            [[width height back similar-cards] & rest] sized-backed]
+;       (let [renderables (map (comp game/component-to-renderable :front)
+;                              similar-cards)
+;             back-renderable (game/component-to-renderable back)
+;             back (<! (image/image back-renderable))
+;             sheets (<! (make-spreadsheets renderables width height))
+;             errors (concat (filter identity (map :errors sheets)))
+;             sheets (map :value sheets)
+;             deck-numbers (range deck-number (+ deck-number (count sheets)))
+;             card-numbers (for [deck-number deck-numbers
+;                                n (range 1 70)]
+;                            (+ n (* 100 deck-number)))
+;             next (merge-with into acc
+;                    {:sheets (map vector deck-numbers sheets)
+;                     :backs (map vector deck-numbers (repeat back))
+;                     :errors errors
+;                     :card-ids (map vector similar-cards card-numbers)})]
+;         (if rest
+;           (recur (+ deck-number (count sheets)) next rest)
+;           (>! ret next))))))
 
 (def ^:private tables
   {:octagon "Table_Octagon"

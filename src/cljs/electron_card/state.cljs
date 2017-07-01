@@ -1,9 +1,8 @@
 (ns electron-card.state
-  (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [electron-card.game :refer [extract-components]]
             [electron-card.eval :as ev]
             [clojure.set :as set]
-            [cljs.core.async :refer [promise-chan put! <!]]))
+            [promesa.core :as p]))
 
 (def ^:private fs (js/require "fs"))
 
@@ -25,23 +24,26 @@
   (remove-watch errors key))
 
 (defn- read-file [path]
-  (let [ret (promise-chan)]
-    ; TODO: report error properly
-    (.readFile fs path "utf8" #(put! ret %2))
-    ret))
+  (p/promise
+    (fn [resolve reject]
+      (.readFile fs path "utf8"
+        (fn [err data]
+          (if err
+            (reject [err])
+            (resolve data)))))))
 
 (defn- file-changed [kind file]
   (when (= kind "change")
-    (go
-      (let [new-source (<! (read-file file))]
-        (when (not= @last-source new-source)
-          (reset! last-source new-source)
-          (let [errs errors
-                {:keys [errors value]} (<! (ev/eval new-source))]
-            (reset! errs errors)
-            (when value
-              (reset! last-components (extract-components @game))
-              (reset! game value))))))))
+    (-> (read-file file)
+        (p/then
+          (fn [new-source]
+            (when (not= @last-source new-source)
+              (p/then (ev/eval new-source)
+                (fn [value]
+                  (reset! errors [])
+                  (reset! last-components (extract-components @game))
+                  (reset! game value))))))
+        (p/catch #(reset! errors (if (coll? %) % [%]))))))
 
 (defn get-state []
   @game)

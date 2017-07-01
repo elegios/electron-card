@@ -1,7 +1,7 @@
 (ns electron-card.upload.imgur
   (:require [electron-card.keys :refer [imgur-clientid]
                                 :rename {imgur-clientid clientid}]
-            [cljs.core.async :refer [promise-chan put!]]))
+            [promesa.core :as p]))
 
 ; TODO: request brings in a lot of dependencies, examine doing without
 (def ^:private request
@@ -17,13 +17,13 @@
 
 (defn upload
   [data-url]
-  (let [ret (promise-chan)]
-    (.post request
-      #js{:url "https://api.imgur.com/3/upload"
-          :formData #js{:type "base64" :image data-url}}
-      (fn [err _ body]
-        (put! ret
-          (if err
-            {:error err}
-            (format body)))))
-    ret))
+  (p/promise
+    (fn [resolve reject]
+      (.post request
+        #js{:url "https://api.imgur.com/3/upload"
+            :formData #js{:type "base64" :image data-url}}
+        (fn [err _ body]
+          (cond
+            err (reject err)
+            (body "success") (resolve ((body "data") "link"))
+            :default (reject [body])))))))

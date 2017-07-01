@@ -1,7 +1,7 @@
 (ns electron-card.eval
   (:require [cljs.js :as cljs]
-            [cljs.core.async :refer [promise-chan put!]]
             [clojure.string :as str]
+            [promesa.core :as p]
             [cljs.analyzer :as ana]))
 
 (set! js/cljs.user #js{})
@@ -233,16 +233,16 @@
   (println "would load" thing)
   (cb {:lang :js :source ""}))
 
-(defn- normalize-output [warnings {:keys [value error]}]
+(defn- normalize-output [resolve reject warnings {:keys [value error]}]
   (cond
     error
-    {:errors (->> error ex-cause .-message (conj warnings))}
+    (reject (->> error ex-cause .-message (conj warnings)))
 
     (seq warnings)
-    {:errors warnings}
+    (reject warnings)
 
     :default
-    {:value value}))
+    (resolve value)))
 
 (defn- handler [warnings]
   (fn [warning-type env extra]
@@ -251,12 +251,12 @@
         (swap! warnings conj (ana/message env s))))))
 
 (defn eval [source]
-  (let [ret (promise-chan)
-        warnings (atom [])]
-    (purge-cljs-user!)
-    (binding [ana/*cljs-warning-handlers* [(handler warnings)]]
-      (cljs/eval-str st source 'cljs.user
-                     {:eval (node-eval warnings) :load load-fn :ns 'cljs.user}
-                     #(put! ret (normalize-output @warnings %))))
-    ret))
+  (p/promise
+    (fn [resolve reject]
+      (let [warnings (atom [])]
+        (purge-cljs-user!)
+        (binding [ana/*cljs-warning-handlers* [(handler warnings)]]
+          (cljs/eval-str st source 'cljs.user
+                         {:eval (node-eval warnings) :load load-fn :ns 'cljs.user}
+                         #(normalize-output resolve reject @warnings %)))))))
 
