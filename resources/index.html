@@ -68,7 +68,7 @@
         </span>
         <span>
           10%
-          <input type="range" min="10" max="200" step="10" value="100" oninput="updateScale(this.value)">
+          <input type="range" min="10" max="200" step="10" value="100" oninput="updateScale(this.value)"/>
           200%
           <span id="scale-text">(100%)</span>
         </span>
@@ -80,9 +80,11 @@
         <b>Export:</b>
         </span>
         <span>
-          <input id="dpi" type"number" value="96" oninput="updateDpi(this.value)">
+          <input id="dpi" type"number" value="96" oninput="updateDpi(this.value)"/>
           <label for="dpi">DPI</label>
         </span>
+        <button onclick="document.getElementById('component-dump-selector').click()">Export components</button>
+        <input id="component-dump-selector" type="file" webkitdirectory style="display:none;" onchange="componentDirSelected(this.files)"/>
       </div>
       <div id="display-area" style="--component-scale:1.0;"></div>
       <div id="errors"></div>
@@ -100,6 +102,12 @@
 
   function updateDpi(dpi) {
     document.getElementById("render-area").style.setProperty("--component-scale", dpi/96);
+  }
+
+  function componentDirSelected(files) {
+    if (!files.length)
+      return;
+    electron_card.app.export_components(files[0].path);
   }
   </script>
 </html>

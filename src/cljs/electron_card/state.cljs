@@ -60,3 +60,6 @@
   ; TODO: report error probably
   (reset! watcher (.watch fs path #js{} file-changed))
   (file-changed "change" path))
+
+(defn add-errors [errs]
+  (swap! errors into errs))

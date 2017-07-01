@@ -13,15 +13,16 @@
 
 ; TODO: promesa (actually bluebird) requirest that values that are rejected with are Error, add one of those that collects all errors
 
-(defn test-render []
-  (let [upload-fn (file/make-save-fn "./out")]
+; TODO: present feedback that it's done, probably move out of app.cljs
+(defn export-components [directory]
+  (let [upload-fn (file/make-save-fn directory)]
     (->> (state/get-all-components)
          (map game/component-to-renderable)
          (map image/image)
          (map #(p/then % upload-fn))
          p/all
          (p/map #(println "value: " %))
-         (p/catch #(println "catch: " %)))))
+         (p/catch #(state/add-errors (if (coll? %) % [%]))))))
 
 (defn init []
   (state/add-game-update-fn :default view/update-game)
