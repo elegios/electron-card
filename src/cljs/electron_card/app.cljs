@@ -3,6 +3,7 @@
             [electron-card.state :as state]
             [electron-card.view :as view]
             [electron-card.image :as image]
+            [electron-card.renderable :as renderable]
             [electron-card.upload.file :as file]
             [electron-card.game :as game]
             [electron-card.game.tts :as tts]
@@ -17,7 +18,7 @@
 (defn export-components [directory]
   (let [upload-fn (file/make-save-fn directory)]
     (->> (state/get-all-components)
-         (map game/component-to-renderable)
+         (map renderable/component-to-renderable)
          (map image/image)
          (map #(p/then % upload-fn))
          p/all
@@ -28,7 +29,7 @@
   (state/add-game-update-fn :default view/update-game)
   (state/add-errors-update-fn :default view/update-errors)
   (view/init)
-  (state/watch-file "test.cljs")
+  (state/watch-file "../testproject/source.cljs")
   (println "init"))
 
 (set! *main-cli-fn* init)

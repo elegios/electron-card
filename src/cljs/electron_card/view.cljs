@@ -1,7 +1,7 @@
 (ns electron-card.view
   (:require [hipo.core :as hipo]
             [garden.core :refer [css]]
-            [electron-card.game :as game]
+            [electron-card.renderable :as renderable]
             [electron-card.state :as state]
             [clojure.string :as str]))
 
@@ -14,7 +14,7 @@
 
 (defn render-components [components]
   (let [comp-style (js/document.getElementById "components-style")
-        renderables (map game/component-to-renderable components)
+        renderables (map renderable/component-to-renderable components)
         comp-html (apply vector :div#components-html.component-container (map :html renderables))]
     (set! (.-innerHTML comp-style) (apply css (map :css renderables)))
     (if @components-html
