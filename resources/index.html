@@ -33,16 +33,22 @@
       width: 100%;
       height: 100%;
     }
-    #components-html > div,
-    #render-area > div {
+    .component-container > div {
       overflow: hidden;
       margin-right: 3px;
       margin-bottom: 3px;
     }
-    #components-html > div > div,
-    #render-area > div > div {
+    .component-container > div > div {
       transform-origin: 0px 0px;
       transform: scale(var(--component-scale));
+    }
+    .component-container > div > div {
+      position: relative;
+      left: 0px;
+      top: 0px;
+    }
+    .component-container > div > div > * {
+      position: absolute;
     }
     #controls {
       border-bottom-style: solid;
@@ -80,16 +86,16 @@
         <b>Export:</b>
         </span>
         <span>
-          <input id="dpi" type"number" value="96" oninput="updateDpi(this.value)"/>
+          <input id="dpi" type="number" value="96" oninput="updateDpi(this.valueAsNumber)"/>
           <label for="dpi">DPI</label>
         </span>
         <button onclick="document.getElementById('component-dump-selector').click()">Export components</button>
         <input id="component-dump-selector" type="file" webkitdirectory style="display:none;" onchange="componentDirSelected(this.files)"/>
       </div>
-      <div id="display-area" style="--component-scale:1.0;"></div>
+      <div id="display-area"></div>
       <div id="errors"></div>
     </div>
-    <div id="render-area">
+    <div id="render-area" class="component-container">
     </div>
   </body>
   <script>
@@ -101,6 +107,8 @@
   }
 
   function updateDpi(dpi) {
+    if (Number.isNaN(dpi) || dpi <= 0)
+      return;
     document.getElementById("render-area").style.setProperty("--component-scale", dpi/96);
   }
 

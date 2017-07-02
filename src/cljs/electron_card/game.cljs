@@ -12,11 +12,11 @@
         css [(keyword (str ".outer" id-str))
              {:min-width calc-width :max-width calc-width
               :min-height calc-height :max-height calc-height}
-             (apply vector (keyword (str ".inner.comp" id-str))
+             (apply vector (keyword (str ".comp" id-str))
                            {:width width :height height}
                            css)]
         html [(keyword (str "div.outer" id-str))
-              (apply vector (keyword (str "div.inner.comp" id-str)) html)]]
+              (apply vector (keyword (str "div.comp" id-str)) html)]]
     {:css css :html html}))
 
 (defmulti extract-components :type)

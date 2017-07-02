@@ -15,7 +15,7 @@
 (defn render-components [components]
   (let [comp-style (js/document.getElementById "components-style")
         renderables (map game/component-to-renderable components)
-        comp-html (apply vector :div#components-html (map :html renderables))]
+        comp-html (apply vector :div#components-html.component-container (map :html renderables))]
     (set! (.-innerHTML comp-style) (apply css (map :css renderables)))
     (if @components-html
       (hipo/reconciliate! @components-html comp-html)
