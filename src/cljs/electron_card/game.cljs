@@ -31,30 +31,24 @@
 
 (s/def ::css (s/map-of keyword? any?))
 
-; TODO: errors within css specs won't be reported nicely
-(defn- inner-css?
-  [[key css & children]]
-  (and (keyword? key)
-       (s/valid? ::css css)
-       (every? inner-css? children)))
-(s/def ::inner-css (s/coll-of inner-css?))
+(s/def ::inner-css
+  (s/every
+    (s/cat :key keyword?
+           :css ::css
+           :children (s/* ::inner-css))))
 
-; TODO: errors within html specs won't be reported nicely
-(declare html?)
-(defn- html-child?
-  [child]
-  (or (nil? child)
-      (string? child)
-      (and (seq? child)
-           (every? html-child? child))
-      (html? child)))
-(defn- html?
-  [spec]
-  (s/valid? (s/cat :key keyword?
-                   :attributes (s/? (s/map-of keyword? any?))
-                   :children (s/* html-child?))
-            spec))
-(s/def ::children (s/coll-of html-child?))
+(s/def ::html-child
+  (s/or :nil nil?
+        :string string?
+        :seq (s/coll-of ::html-child :kind seq?)
+        :html ::html))
+
+(s/def ::html
+  (s/cat :key keyword?
+         :attributes (s/? (s/map-of keyword? any?))
+         :children (s/* ::html-child)))
+
+(s/def ::children (s/every ::html-child))
 
 (s/def ::src string?)
 

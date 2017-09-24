@@ -55,10 +55,6 @@
    "(SPECIAL)" [:img {:src "eclipse-flare.svg"}]
    "\n" [:br]})
 
-(def keywords
-  #{"atk" "draw" "spend" "unspend" "passive" "exile" "destroy" "discard"
-    "permanent" "permanents"})
-
 (defn regex-find
   [re s]
   (when-let [result (.exec re s)]
@@ -129,7 +125,7 @@
             "(MAGIC)(SPECIAL): Exile a card from your hand or board: Destroy a permanent. Use only on your turn, and only once per turn."]}
    {:title "Sticky Bombs"
     :texts ["Your (SPECIAL) are permanents that can be played by discarding a card."
-            "When you play a (SPECIAL), take up to two cards from your graveyard, attach them to cards your opponent controls of the same kind. (If one of your attached cards would leave the board, exile it instead)"
+            "When you play a (SPECIAL), take up to two cards from your discard pile, attach them to cards your opponent controls of the same kind. (If one of your attached cards would leave the board, put it in the discard pile instead.)"
             "(SPECIAL) Active: Destroy all cards your opponent controls that you have attached cards to (through the effect above). Destroy self."]}
    {:title "Trinities"
     :texts ["Three basic cards of the same kind but different suits form a trinity."
@@ -178,4 +174,5 @@
 
 ; DPI for tabletopia 254(?)
 {:type :component-collection
- :components (into (conj fronts back) extras)}
+ :components (concat (conj fronts back)
+                     extras)}
