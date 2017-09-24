@@ -12,7 +12,7 @@
 
 (nodejs/enable-util-print!)
 
-; TODO: promesa (actually bluebird) requirest that values that are rejected with are Error, add one of those that collects all errors
+; TODO: promesa (actually bluebird) requires that values that are rejected with are Error, add one of those that collects all errors
 
 ; TODO: present feedback that it's done, probably move out of app.cljs
 (defn export-components [directory]

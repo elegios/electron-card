@@ -50,6 +50,15 @@
     .component-container > div > div > * {
       position: absolute;
     }
+    .component-container > div > div > .image-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .component-container > div > div > .image-container > img {
+      max-width: 100%;
+      max-height: 100%;
+    }
     #controls {
       border-bottom-style: solid;
       display: flex;
@@ -62,6 +71,7 @@
       order: 3;
       white-space: pre-line;
       background-color: hotpink;
+      overflow-y: auto;
     }
     </style>
   </head>

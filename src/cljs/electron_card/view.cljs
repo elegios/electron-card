@@ -14,9 +14,12 @@
 
 (defn render-components [components]
   (let [comp-style (js/document.getElementById "components-style")
+        components (sort-by :sort-key components)
         renderables (map renderable/component-to-renderable components)
-        comp-html (apply vector :div#components-html.component-container (map :html renderables))]
-    (set! (.-innerHTML comp-style) (apply css (map :css renderables)))
+        comp-html (apply vector :div#components-html.component-container (map :html renderables))
+        generated-css (apply css (map :css renderables))]
+    (println "generated-css" generated-css)
+    (set! (.-innerHTML comp-style) generated-css)
     (if @components-html
       (hipo/reconciliate! @components-html comp-html)
       (do

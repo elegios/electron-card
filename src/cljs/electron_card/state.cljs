@@ -2,6 +2,7 @@
   (:require [electron-card.game :refer [extract-components]]
             [electron-card.eval :as ev]
             [clojure.set :as set]
+            [clojure.spec.alpha :as s]
             [promesa.core :as p]))
 
 (def ^:private node-path (js/require "path"))
@@ -34,6 +35,15 @@
             (reject [err])
             (resolve data)))))))
 
+(defn- check-game
+  [game]
+  (p/promise
+    (fn [resolve reject]
+      (if-let [err (s/explain-data :electron-card.game/game game)]
+        ; TODO: better error, it's massive right now
+        (-> err s/explain-out with-out-str reject)
+        (resolve game)))))
+
 (defn- file-changed [kind file]
   (when (= kind "change")
     (-> (read-file (.join node-path @dir file))
@@ -41,11 +51,13 @@
           (fn [new-source]
             (when (not= @last-source new-source)
               (reset! last-source new-source)
-              (p/then (ev/eval new-source)
-                (fn [value]
-                  (reset! errors [])
-                  (reset! last-components (extract-components @game))
-                  (reset! game value))))))
+              (-> (ev/eval new-source)
+                  (p/then check-game)
+                  (p/then
+                    (fn [value]
+                      (reset! errors [])
+                      (reset! last-components (extract-components @game))
+                      (reset! game value)))))))
         (p/catch #(reset! errors (if (coll? %) % [%]))))))
 
 (defn get-dir []
