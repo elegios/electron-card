@@ -3,22 +3,27 @@
 
 (defmulti extract-components :type)
 
+(defmulti export #(:type %1))
+
 (defmethod extract-components :empty
   [_]
   #{})
-
-(defmethod extract-components :component-collection
-  [{:keys [components]}]
-  (set components))
 
 (defmethod extract-components :default
   [coll]
   ; TODO: report error probably
   (set coll))
 
+(defmethod export :default
+  [_ directory]
+  ; TODO: report error probably
+  nil)
+
 (defmulti game-type :type)
 
-(s/def ::game (s/multi-spec game-type :type))
+(s/def ::type keyword?)
+(s/def ::game (s/merge (s/keys :req-un [::type])
+                (s/multi-spec game-type :type)))
 
 (s/def ::sort-key string?)
 
@@ -71,7 +76,3 @@
 (s/def ::elements (s/coll-of ::element :kind sequential?))
 
 (s/def ::component (s/keys :req-un [::width ::height ::elements ::sort-key]))
-(s/def ::components (s/coll-of ::component))
-
-(defmethod game-type :component-collection [_]
-  (s/keys :req-un [::type ::components]))

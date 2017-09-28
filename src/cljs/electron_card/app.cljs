@@ -4,9 +4,9 @@
             [electron-card.view :as view]
             [electron-card.image :as image]
             [electron-card.renderable :as renderable]
-            [electron-card.upload.file :as file]
             [electron-card.game :as game]
-            [electron-card.game.tts :as tts]
+            [electron-card.game.tts]
+            [electron-card.game.component-collection]
             [promesa.core :as p]
             [com.rpl.specter :refer [MAP-VALS] :refer-macros [transform]]))
 
@@ -14,16 +14,11 @@
 
 ; TODO: promesa (actually bluebird) requires that values that are rejected with are Error, add one of those that collects all errors
 
-; TODO: present feedback that it's done, probably move out of app.cljs
-(defn export-components [directory]
-  (let [upload-fn (file/make-save-fn directory)]
-    (->> (state/get-all-components)
-         (map renderable/component-to-renderable)
-         (map image/image)
-         (map #(p/then % upload-fn))
-         p/all
-         (p/map #(println "value: " %))
-         (p/catch #(state/add-errors (if (coll? %) % [%]))))))
+(defn export-dir [directory]
+  (-> (state/get-state)
+      (game/export directory)
+      (p/then #(js/alert "Export complete"))
+      (p/catch #(state/add-errors (if (coll? %) % [%])))))
 
 (defn init []
   (state/add-game-update-fn :default view/update-game)
