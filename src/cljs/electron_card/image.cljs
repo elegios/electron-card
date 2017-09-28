@@ -34,4 +34,7 @@
   (let [style [:style (-> renderable :css css)]
         html (conj (:html renderable) style)
         node (hipo/create html)]
-    (render-node node)))
+    (p/then (render-node node)
+      (fn [data-url]
+        {:data-url data-url
+         :sort-key (:sort-key renderable)}))))

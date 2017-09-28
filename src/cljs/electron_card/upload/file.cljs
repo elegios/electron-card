@@ -9,11 +9,11 @@
   [directory]
   ; TODO: ensure directory exists
   (let [file-num (atom 0)]
-    (fn [data-url]
+    (fn [{:keys [data-url sort-key]}]
       (p/promise
         (fn [resolve reject]
           (let [num (swap! file-num inc)
-                path (.join path directory (str num ".png"))
+                path (.join path directory (str sort-key "_" num ".png"))
                 data (str/replace data-url #"^data:image/png;base64," "")]
             (.writeFile fs path data "base64"
               (fn [err]

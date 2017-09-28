@@ -43,16 +43,16 @@
   (str/replace literal #"[-[\]{}()*+!<=:?.\/\\^$|#\s,]" "\\$&"))
 
 (def literal-replacements
-  {"(MACHINE)" [:img {:src "big-gear.svg"}]
-   "(MAGIC)" [:img {:src "sundial.svg"}]
-   "(NATURE)" [:img {:src "plants-and-animals.svg"}]
-   "(HOUSE)" [:img {:src "white-tower.svg"}]
-   "(RANGED)" [:img {:src "crossbow.svg"}]
-   "(WARRIOR)" [:img {:src "crossed-swords.svg"}]
-   "(DEFENDER)" [:img {:src "rosa-shield.svg"}]
-   "(ATTACK)" [:img {:src "power-lightning.svg"}]
-   "(CEASEFIRE)" [:img {:src "yin-yang.svg"}]
-   "(SPECIAL)" [:img {:src "eclipse-flare.svg"}]
+  {"(MACHINE)" [:img {:src "machine.svg"}]
+   "(MAGIC)" [:img {:src "magic.svg"}]
+   "(NATURE)" [:img {:src "nature.svg"}]
+   "(TOWER)" [:img {:src "tower.svg"}]
+   "(RANGED)" [:img {:src "ranged.svg"}]
+   "(WARRIOR)" [:img {:src "warrior.svg"}]
+   "(DEFENDER)" [:img {:src "defender.svg"}]
+   "(ATTACK)" [:img {:src "action.svg"}]
+   "(CEASEFIRE)" [:img {:src "ceasefire.svg"}]
+   "(SPECIAL)" [:img {:src "special.svg"}]
    "\n" [:br]})
 
 (defn regex-find
@@ -133,7 +133,7 @@
             "Each trinity you control grants an effect depending on its kind:"
             "(WARRIOR): +1/+0
              (DEFENDER): +0/+1
-             (HOUSE): +1 (DRAW)
+             (TOWER): +1 (DRAW)
              (RANGED): Spend a (RANGED) you control: Destroy a permanent. Use only on your turn, and only once per turn."]}
    {:title "Ninjas"
     :texts ["Twice per turn, when you play a basic permanent you may return a similar (i.e. same kind or suit) card you control to its owners hand instead of discarding a card."
@@ -147,23 +147,28 @@
             "When you play a basic permanent you may empower it (attach an exiled (MAGIC) card of the same kind)."
             "If an empowered card would be destroyed, exile the attached (MAGIC) card instead."
             "(DEFENDER): Passive: None.
-             (RANGED): Passive: +X (ATK), where X is the number of empowered cards you control."]}])
-
-(def back (image-card "castle.svg"))
+             (RANGED): Passive: +X (ATK), where X is the number of empowered cards you control."]}
+   {:title "Squirrels"
+    :texts ["Squirrels are permanents with passive +1/+0, represented by facedown cards. When they would leave the board, put them in their owners discard pile."
+            "At most once per turn, during your turn, choose one:
+             - Target (DEFENDER) you control and the top two cards of your deck become squirrels under your control.
+             - Target non-(DEFENDER) you control and the top card of your deck become squirrels under your control."]}])
 
 (def basics
-  [["white-tower.svg" "None" "Base draw = 3"]
-   ["crossbow.svg" "+1/+0" "+1/+0"]
-   ["crossed-swords.svg" "+0/+1" "+1/+0"]
-   ["rosa-shield.svg" "+0/+1" "+0/+1"]
-   ["power-lightning.svg"]
-   ["eclipse-flare.svg"]
-   ["yin-yang.svg" "Exile self." "-3/+3"]])
+  [["tower.svg" "None" "Base draw = 3"]
+   ["ranged.svg" "+1/+0" "+1/+0"]
+   ["warrior.svg" "+0/+1" "+1/+0"]
+   ["defender.svg" "+0/+1" "+0/+1"]
+   ["action.svg"]
+   ["special.svg"]
+   ["ceasefire.svg" "Exile self." "-3/+3"]])
+
+(def back (image-card "back.svg"))
 
 (def suits
-  ["sundial.svg"
-   "plants-and-animals.svg"
-   "big-gear.svg"])
+  ["magic.svg"
+   "nature.svg"
+   "machine.svg"])
 
 (def fronts
   (for [[icon active passive] basics suit suits]

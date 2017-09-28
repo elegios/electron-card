@@ -55,7 +55,7 @@
 
 (defn component-to-renderable
   [component]
-  (let [{:keys [width height elements]}
+  (let [{:keys [width height elements sort-key]}
         (s/conform :electron-card.game/component component)
         id-str (str (swap! last-id inc))
         calc-width (str "calc(var(--component-scale) * " width ")")
@@ -73,4 +73,4 @@
               (apply vector :div element-html)]
         html (transform [(walker is-img) (must 1) (must :src)]
                         fix-path html)]
-    {:css css :html html}))
+    {:css css :html html :sort-key sort-key}))

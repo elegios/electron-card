@@ -18,7 +18,6 @@
         renderables (map renderable/component-to-renderable components)
         comp-html (apply vector :div#components-html.component-container (map :html renderables))
         generated-css (apply css (map :css renderables))]
-    (println "generated-css" generated-css)
     (set! (.-innerHTML comp-style) generated-css)
     (if @components-html
       (hipo/reconciliate! @components-html comp-html)
