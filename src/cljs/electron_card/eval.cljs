@@ -236,7 +236,7 @@
 (defn- normalize-output [resolve reject warnings {:keys [value error]}]
   (cond
     error
-    (reject (->> error ex-cause .-message (conj warnings)))
+    (reject (conj warnings (ex-cause error)))
 
     (seq warnings)
     (reject warnings)
