@@ -8,6 +8,9 @@
 
 (s/def ::components (s/coll-of :electron-card.game/component))
 
+(defmethod game/game-type :component-collection [_]
+  (s/keys :req-un [::components]))
+
 (def ^:private path (js/require "path"))
 (def ^:private fs (js/require "fs"))
 
@@ -26,9 +29,6 @@
                 (if err
                   (reject [err])
                   (resolve path))))))))))
-
-(defmethod game/game-type :component-collection [_]
-  (s/keys :req-un [:electron-card.game/type ::components]))
 
 (defmethod game/extract-components :component-collection
   [{:keys [components]}]
