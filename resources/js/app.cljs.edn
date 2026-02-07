@@ -1,2 +1,0 @@
-{:require  [electron-card.app]
- :compiler-options {:asset-path "js/app.out"}}

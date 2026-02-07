@@ -1,9 +1,8 @@
 (ns electron-card.image
   (:require [garden.core :refer [css]]
             [hipo.core :as hipo]
-            [promesa.core :as p]))
-
-(def ^:private dom-to-image (js/require "dom-to-image"))
+            [promesa.core :as p]
+            [cljsjs.dom-to-image]))
 
 (defn- render-node
   [node]

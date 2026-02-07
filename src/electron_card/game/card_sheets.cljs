@@ -4,9 +4,8 @@
             [electron-card.renderable :as renderable]
             [promesa.core :as p]
             [clojure.spec.alpha :as s]
-            [com.rpl.specter :refer [ALL multi-path] :refer-macros [select]]))
-
-(def jspdf ^:private (js/require "jspdf"))
+            [com.rpl.specter :refer [ALL multi-path] :refer-macros [select]]
+            [cljsjs.jspdf]))
 
 (s/def ::front :electron-card.game/component)
 (s/def ::back :electron-card.game/component)

@@ -137,4 +137,8 @@ bh_unicode_properties.cache
 GitHub.sublime-settings
 
 # End of https://www.gitignore.io/api/clojure,node,sublimetext,macos
+
 src/cljs/electron_card/keys.cljs
+.cpcache
+/resources/js/
+!/resources/js/cljsc_opts.edn

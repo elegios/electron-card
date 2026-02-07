@@ -26,7 +26,7 @@
     (str "file://" path)
 
     :default
-    (.join node-path (get-dir) path)))
+    (.join node-path (process.cwd) (get-dir) path)))
 
 (selectors/defselector immediate ">")
 

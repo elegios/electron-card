@@ -110,7 +110,9 @@
     </div>
   </body>
   <script>
-  require("./js/app.js")
+  require("./js/main.js")
+  setTimeout(() => electron_card.app.init(), 1000);
+  // electron_card.app.init();
 
   function updateScale(scale) {
     document.getElementById("display-area").style.setProperty("--component-scale", scale/100);

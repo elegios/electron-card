@@ -25,7 +25,7 @@
   (state/add-game-update-fn :default view/update-game)
   (state/add-errors-update-fn :default view/update-errors)
   (view/init)
-  (state/watch-file "../testproject/source.cljs")
+  (state/watch-file "testproject/source.cljs")
   (println "init"))
 
 (set! *main-cli-fn* init)

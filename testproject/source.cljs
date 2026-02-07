@@ -63,6 +63,27 @@
    "[SPECIAL]" [:img {:src (suffix "special")}]
    "\n" [:br]})
 
+(declare reminder-text)
+(declare regex-find-multiple)
+(defn symbolize-text
+  [text]
+  (let [re (->> literal-replacements
+                keys
+                (map regex-escape)
+                (str/join "|")
+                re-pattern)
+        reps {re literal-replacements
+              #"\([^)]*\)" reminder-text}]
+    (loop [res []
+           text text]
+      (if-let [{:keys [index result re-value]} (regex-find-multiple reps text)]
+        (recur (conj res
+                     (subs text 0 index)
+                     (re-value result))
+               (subs text (+ index (count result))))
+        [:p (filter #(and % (not= "" %))
+                    (conj res text))]))))
+
 (defn reminder-text
   [text]
   (println "reminder-text" text)
@@ -88,25 +109,6 @@
                          (filter identity))
                        (keys res)))]
     (apply min-key :index finds)))
-
-(defn symbolize-text
-  [text]
-  (let [re (->> literal-replacements
-                keys
-                (map regex-escape)
-                (str/join "|")
-                re-pattern)
-        reps {re literal-replacements
-              #"\([^)]*\)" reminder-text}]
-    (loop [res []
-           text text]
-      (if-let [{:keys [index result re-value]} (regex-find-multiple reps text)]
-        (recur (conj res
-                     (subs text 0 index)
-                     (re-value result))
-               (subs text (+ index (count result))))
-        [:p (filter #(and % (not= "" %))
-                    (conj res text))]))))
 
 (defn extra-card
   [{:keys [title texts]}]
